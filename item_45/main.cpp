@@ -30,13 +30,11 @@ class Bottom: public Middle { /* ... */ };
 
 int main()
 {
-
-SmartPtr<Middle> middlePtr(new Middle); 
-// Conversion 1: Derived -> Base (Middle* -> Top*)
-SmartPtr<Top> topPtr1 = middlePtr; 
-// Conversion 2: Derived -> Base (Bottom* -> Top*) via temporary
-SmartPtr<Top> topPtr2 = SmartPtr<Bottom>(new Bottom); 
-// Conversion 3: Non-const -> Const
-SmartPtr<const Top> constTopPtr = topPtr1;
-
+    SmartPtr<Middle> middlePtr(new Middle); 
+    // Conversion 1: Derived -> Base (Middle* -> Top*)
+    SmartPtr<Top> topPtr1 = middlePtr; 
+    // Conversion 2: Derived -> Base (Bottom* -> Top*) via temporary
+    SmartPtr<Top> topPtr2 = SmartPtr<Bottom>(new Bottom); 
+    // Conversion 3: Non-const -> Const
+    SmartPtr<const Top> constTopPtr = topPtr1;
 }
