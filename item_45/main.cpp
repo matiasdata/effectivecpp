@@ -92,5 +92,8 @@ Critical Rule:
 Declaring a generalized copy/assignment template does not suppress the
 compiler's generation of the normal copy constructor/assignment operator.
 You must explicitly declare both the normal and the generalized member
-template versions to control all aspects of copying and assignment.
+template versions to control all aspects of copying and assignment, otherwise
+the compiler will still generate a default copy constructor which might not be 
+appropriate in all cases.
+
 */
