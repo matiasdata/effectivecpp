@@ -2,6 +2,11 @@
 #include <numeric>
 #include <stdexcept>
 
+template<typename T> class Rational; // declare rational template 
+
+template<typename T>
+const Rational<T> doMultiply( const Rational<T>& lhs,const Rational<T>& rhs); // declare helper template
+
 template <typename T>
 class Rational
 {
@@ -14,7 +19,7 @@ public:
     }
     const T getnum() const {return num;}
     const T getden() const {return den;}
-    Rational<T>& operator+=(const Rational<T>& other)
+    Rational& operator+=(const Rational& other) // inside a template class, one can write Rational (shorthand) instead of Rational<T>, both are valid.
     {
         T pden = den*other.den;
         T pnum = num*other.den + other.num*den;
@@ -22,18 +27,22 @@ public:
         den = pden;
         return *this;
     }
+    friend const Rational operator*(const Rational& lhs, const Rational& rhs) // define operator* function so that main compiles 
+    // {
+    //     return Rational(lhs.getnum() * rhs.getnum(), lhs.getden() * rhs.getden());
+    // } 
+    {
+        return doMultiply(lhs,rhs);
+    }
 private:
     T num, den;
 };
 
 template <typename T>
-inline const Rational<T> operator*(const Rational<T>& lhs, const Rational<T>& rhs){
+const Rational<T> doMultiply(const Rational<T>& lhs, const Rational<T>& rhs){
     return Rational(lhs.getnum() * rhs.getnum(), lhs.getden() * rhs.getden());
 }
-// Keep operator* as a non-member non-friend.
-// The getter calls don’t hurt efficiency (they’ll inline). 
-// Returning an int involves no heap allocation, no hidden copies — it’s literally just loading an integer from memory.
-// This way, your Rational remains more encapsulated and extensible.
+
 
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Rational<T>& r) {
@@ -47,6 +56,7 @@ int main()
     Rational<int> result;
     result = oneFourth * 2; // error: no operator "*" matches these operands, operand types are: int * Rational<int>
     // candidate function template "operator*" failed deduction
+    // this happens if we don't declare the function inside the class
     std::cout << "Result = " << result << "\n";
     result = 2 * oneFourth; // no operator "*" matches these operands
     std::cout << "Result = " << result << "\n";
