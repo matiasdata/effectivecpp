@@ -28,12 +28,11 @@ public:
         return *this;
     }
     friend const Rational operator*(const Rational& lhs, const Rational& rhs) // define operator* function so that main compiles 
-    // {
-    //     return Rational(lhs.getnum() * rhs.getnum(), lhs.getden() * rhs.getden());
-    // } 
-    {
-        return doMultiply(lhs,rhs);
-    }
+    {return doMultiply(lhs,rhs);} // call helper function (defer implementation), useful for complex functions, not particularly in this example
+
+    // {return Rational(lhs.getnum() * rhs.getnum(), lhs.getden() * rhs.getden());} // implementation for simple functions
+
+
 private:
     T num, den;
 };
