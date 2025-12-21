@@ -93,7 +93,9 @@ int main()
  via the class instantiation, it exists as a specific non-template function. 
  If you define it outside as a template, the linker cannot connect the two. 
  Therefore, the implementation must be defined inside the class body to link 
- correctly.
+ correctly. You can defer the implementation to a function outside a class by 
+ calling a helper template function which can be a non-member, non-friend template
+ function that does all the work.
 
  EXAMPLE SUMMARY:
  - Standalone Template: Fails because deduction forbids conversion.
