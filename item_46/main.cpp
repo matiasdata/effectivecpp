@@ -57,7 +57,7 @@ int main()
     // candidate function template "operator*" failed deduction
     // this happens if we don't declare the function inside the class
     std::cout << "Result = " << result << "\n";
-    result = 2 * oneFourth; // no operator "*" matches these operands
+    result = 2 * oneFourth;
     std::cout << "Result = " << result << "\n";
 }
 
@@ -79,7 +79,7 @@ int main()
  template, the "No-Conversion-During-Deduction" rule prevents calls like 
  '2 * rational' from ever succeeding.
 
- 3. THE "FRIEND INJECTION" SOLUTION:
+ 3. THE "FRIEND INJECTION" SOLUTION (Key):
  To fix this, we declare the function as a friend inside the class template. 
  This technique uses the class instantiation as a "function factory":
  - When the class Template<T> is instantiated, the compiler is forced to 
