@@ -2,6 +2,7 @@
 #include <list>
 #include <iostream>
 #include <iterator>
+#include <concepts>
 
 /* 
 TAGS: Empty structs used solely for overload resolution.
@@ -74,16 +75,42 @@ struct MyListIter
     void operator--(){--ptr;}
 };
 
+// Modern alternative using C++ Concepts:
+
+template <typename IterT, typename DistT>
+concept RandomAccess = requires(IterT iter, DistT d)
+{
+    iter += d; // the type must support the += operator
+};
+
+template <typename IterT, typename DistT>
+requires RandomAccess<IterT, DistT>
+void my_advance(IterT& iter, DistT d)
+{
+    std::cout << "Using fast O(1) advance with Concepts.\n";
+    iter += d;
+}
+
+// Version for everything else (General case)
+template<typename IterT, typename DistT>
+void my_advance(IterT& iter, DistT d) {
+    std::cout << "Using slow O(n) advance with Concepts.\n";
+    while (d--) ++iter;
+}
+
+
 int main()
 {
     // Case 1: Built-in pointer (Uses specialization)
     int arr[] = {1, 2, 3, 4, 5};
     int* p = arr;
     myAdvance(p, 3);
+    my_advance(p, 3);
 
     // Case 2: Custom iterator (Uses internal typedef)
     MyListIter li;
     myAdvance(li, 2);
+    my_advance(li, 2);
     return 0;
 }
 
