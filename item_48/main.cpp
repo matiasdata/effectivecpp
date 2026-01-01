@@ -12,14 +12,7 @@ struct Factorial<0>
     static constexpr uint64_t value = 1;
 };
 
-template <typename T, size_t N>
-void fastAdd(T* a, T* b)
-{
-    if constexpr (N > 0) {
-        a[N-1] += b[N-1]; // add the current element
-        fastAdd<T,N-1>(a,b); // recursively call the previous index
-    }
-}
+
 
 
 template <size_t N>
@@ -42,6 +35,18 @@ struct VectorAdder<0>
 };
 
 
+// modern alternative, does not need template specialization and thus can be written as a normal template function, no need for structs. 
+// looks like a standard function.
+
+template <typename T, size_t N>
+void fastAdd(T* a, T* b)
+{
+    if constexpr (N > 0) {
+        a[N-1] += b[N-1]; // add the current element
+        fastAdd<T,N-1>(a,b); // recursively call the previous index
+    }
+}
+
 int main()
 {
     std::cout << "Factorial<20>::value = " << Factorial<20>::value << "\n"; // compile time recursive calculation with template metaprogramming (TMP)
@@ -50,15 +55,15 @@ int main()
     int i1[2] = {1, 2};
     int i2[2] = {10, 20};
 
-    fastAdd<int, 2>(i1, i2);
-
-    
-
-    std::cout << "Int sum result: " << i1[0] << ", " << i1[1] << "\n";
-
     VectorAdder<2>::add(i1,i2);
 
-    std::cout << "Int sum result: " << i1[0] << ", " << i1[1] << " using VectorAdder<2>::add (again) \n";
+    std::cout << "Int sum result: " << i1[0] << ", " << i1[1] << " using VectorAdder<2>::add \n";
+
+    fastAdd<int, 2>(i1, i2);
+
+    std::cout << "Int sum result: " << i1[0] << ", " << i1[1] << " using fastAdd \n";
+
+
 
     double v1[3] = {1.5, 2.5, 3.5};
     double v2[3] = {10.1, 20.1, 30.1};
@@ -157,6 +162,25 @@ TEMPLATE METAPROGRAMMING (TMP)
  even compile for certain types (e.g., calling .length() on an int). 
  A regular 'if' would cause a compiler error; 'if constexpr' ignores it.
 
+*/
+
+/*
+ FUNCTION TEMPLATES vs. STRUCT TEMPLATES
+ 
+ 1. HISTORICAL CONTEXT:
+ Historically, Template Metaprogramming (TMP) relied on Structs because 
+ they allowed "Partial Specialization" to define base cases. Functions 
+ were harder to specialize without causing "ambiguous call" errors.
+
+ 2. THE C++17 SHIFT:
+ 'if constexpr' allows Function Templates to handle their own base cases. 
+ This makes 'Template Structs' (like the old Item 48 examples) largely 
+ obsolete for simple recursive logic.
+
+ 3. CLEANER SYNTAX:
+ Using a function template (fastAdd<N>) is more natural than a struct 
+ (VectorAdder<N>::add) because it avoids the need for the static 'add' 
+ wrapper and extra boilerplate code.
 */
 
 /*
