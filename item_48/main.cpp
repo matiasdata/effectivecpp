@@ -13,19 +13,29 @@ struct Factorial<0>
 };
 
 template <typename T, size_t N>
+void fastAdd(T* a, T* b)
+{
+    if constexpr (N > 0) {
+        a[N-1] += b[N-1]; // add the current element
+        fastAdd<T,N-1>(a,b); // recursively call the previous index
+    }
+}
+
+
+template <size_t N>
 struct VectorAdder
 {
-    static void add(T* a, T* b)
+    static void add(int* a, int* b)
     {
         a[N-1] += b[N-1]; // add the current element
-        VectorAdder<T,N-1>::add(a,b); // recursively call the previous index
+        VectorAdder<N-1>::add(a,b); // recursively call the previous index
     }
 };
 
-template <typename T>
-struct VectorAdder<T,0>
+template <>
+struct VectorAdder<0>
 {
-    static void add(T* a, T* b)
+    static void add(int* a, int* b)
     {
         // base case: do nothing (loop is finished).
     }
@@ -40,9 +50,15 @@ int main()
     int i1[2] = {1, 2};
     int i2[2] = {10, 20};
 
-    VectorAdder<int, 2>::add(i1, i2);
+    fastAdd<int, 2>(i1, i2);
+
+    
 
     std::cout << "Int sum result: " << i1[0] << ", " << i1[1] << "\n";
+
+    VectorAdder<2>::add(i1,i2);
+
+    std::cout << "Int sum result: " << i1[0] << ", " << i1[1] << " using VectorAdder<2>::add (again) \n";
 
     double v1[3] = {1.5, 2.5, 3.5};
     double v2[3] = {10.1, 20.1, 30.1};
@@ -52,12 +68,12 @@ int main()
     // v1[1] += v2[1];
     // v1[0] += v2[0];
 
-    VectorAdder<double, 3>::add(v1, v2);
+    fastAdd<double,3>(v1, v2);
 
     std::cout << "Double result: " << v1[0] << ", " << v1[1] << ", " << v1[2] << "\n";
     
     return 0;
-};
+}
 
 
 /*
@@ -124,6 +140,26 @@ TEMPLATE METAPROGRAMMING (TMP)
 */
 
 /*
+ WHY 'IF CONSTEXPR' IS MANDATORY FOR TMP
+ 
+ 1. COMPILATION OF ALL BRANCHES:
+ A regular 'if' requires the compiler to generate valid code for both 
+ branches. In recursive templates, this leads to infinite instantiation 
+ because the compiler tries to generate fastAdd<-1>, fastAdd<-2>, etc.
+
+ 2. DISCARDING STATEMENTS:
+ 'if constexpr' allows the compiler to discard the 'true' branch entirely 
+ if the condition is false. This "dead code" is never instantiated, 
+ allowing the recursion to terminate safely.
+
+ 3. TYPE VALIDITY:
+ 'if constexpr' is also used when a branch contains code that wouldn't 
+ even compile for certain types (e.g., calling .length() on an int). 
+ A regular 'if' would cause a compiler error; 'if constexpr' ignores it.
+
+*/
+
+/*
  ASSEMBLY ANALYSIS OF TMP UNROLLING
 
  Using -O3 with VectorAdder<2> results in:
@@ -136,5 +172,5 @@ TEMPLATE METAPROGRAMMING (TMP)
  4. CONSTANT FOLDING: If array values are known at compile-time, the 
     compiler performs the math itself, leaving only 'mov' instructions 
     with the final results in the binary.
-    
+
 */
