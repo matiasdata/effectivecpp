@@ -12,7 +12,14 @@ struct Factorial<0>
     static constexpr uint64_t value = 1;
 };
 
-
+/*
+static constexpr (Values) for TMP:
+    Used in structs/classes to define compile-time global constant associated
+    with the template type. Because they 
+    are 'static' it means the value belongs to the type itself.  Because they 
+    are 'constexpr', they are calculated by the compiler at compile time, not 
+    calculated at run time by the CPU.
+*/
 
 
 template <size_t N>
@@ -76,7 +83,7 @@ int main()
     fastAdd<double,3>(v1, v2);
 
     std::cout << "Double result: " << v1[0] << ", " << v1[1] << ", " << v1[2] << "\n";
-    
+
     return 0;
 }
 
@@ -151,6 +158,9 @@ TEMPLATE METAPROGRAMMING (TMP)
  A regular 'if' requires the compiler to generate valid code for both 
  branches. In recursive templates, this leads to infinite instantiation 
  because the compiler tries to generate fastAdd<-1>, fastAdd<-2>, etc.
+ 'if constexpr' is a compile-time instruction. The compiler evaluates
+ the condition and discards the branch that is false. The code in the
+discarded branch is not even turned into machine code.
 
  2. DISCARDING STATEMENTS:
  'if constexpr' allows the compiler to discard the 'true' branch entirely 
